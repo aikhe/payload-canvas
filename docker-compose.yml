@@ -33,32 +33,36 @@
 version: '3.8'
 
 services:
-  payload:
-    image: node:18-alpine
-    ports:
-      - '3000:3000'
-    volumes:
-      - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
-    command: sh -c "bun install && bun dev"
-    depends_on:
-      - postgres
-    env_file:
-      - .env
+  # Used for running dev server on local or deployment
+  #
+  # payload:
+  #   image: node:18-alpine
+  #   ports:
+  #     - '3000:3000'
+  #   volumes:
+  #     - .:/home/node/app
+  #     - node_modules:/home/node/app/node_modules
+  #   working_dir: /home/node/app/
+  #   command: sh -c "npm install -g pnpm && pnpm install && pnpm dev" # <--- Changed for pnpm
+  #   depends_on:
+  #     - postgres
+  #   env_file:
+  #     - .env
 
   postgres: # New service for PostgreSQL
     image: postgres:16-alpine # Using a lightweight Alpine-based PostgreSQL 16 image
+    restart: always
     container_name: payload_postgres_db # A memorable name for your container
     environment:
+      POSTGRES_ROOT_PASSWORD: lumiforlife34
       POSTGRES_DB: payload_db # Name of your database
       POSTGRES_USER: aikhe # Database user
       POSTGRES_PASSWORD: woainilumi34 # Database password
-    ports:
-      - "5432:5432" # Host port:Container port (maps 5432 on your machine to 5432 in the container)
     volumes:
       - postgres_data:/var/lib/postgresql/data # Persist data outside the container
+    ports:
+      - "5432:5432" # Host port:Container port (maps 5432 on your machine to 5432 in the container)
 
 volumes:
+  # node_modules: # Existing volume for node_modules
   postgres_data: # New named volume for PostgreSQL data
-  node_modules: # Existing volume for node_modules
